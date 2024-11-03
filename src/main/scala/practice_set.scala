@@ -1,6 +1,6 @@
 
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.functions.{col, current_date, datediff, initcap, to_date, when}
+import org.apache.spark.sql.functions.{col, current_date, datediff, initcap, sum, to_date, when}
 
 object practice_set{
   def main(args: Array[String]): Unit = {
@@ -44,6 +44,34 @@ object practice_set{
         |from employee_sql
         |""".stripMargin)
     sql_result.show()
+
+
+    ///////////question-2/////////////
+
+
+    val sales = List(
+      ("karthik", 60000),
+      ("neha", 48000),
+      ("priya", 30000),
+      ("mohan", 24000),
+      ("ajay", 52000),
+      ("vijay", 45000),
+      ("veer", 70000),
+      ("aatish", 23000),
+      ("animesh", 15000),
+      ("nishad", 8000),
+      ("varun", 29000),
+      ("aadil", 32000)
+
+    ).toDF("name", "total_sales")
+
+    val salesDF = sales
+      .withColumn("name", initcap(col("name")))
+      .withColumn("performance_status", when(col("total_sales") > 50000, "Excellent")
+        .when(col("total_sales")>25000 && col("total_sales")<50000, "Good").otherwise("Needs Improvement"))
+    val aggSalesdf = salesDF.groupBy(col("performance_status")).agg(sum(col("total_sales"))).alias("agg_sales")
+    aggSalesdf.show()
+
 
 
 
