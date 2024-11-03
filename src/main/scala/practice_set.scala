@@ -43,6 +43,7 @@ object practice_set{
         |end as status
         |from employee_sql
         |""".stripMargin)
+    sql_result.show()
 
 
 
