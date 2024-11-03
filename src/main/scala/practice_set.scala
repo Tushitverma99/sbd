@@ -34,6 +34,16 @@ object practice_set{
 
     resultDF.show()
 
+    employees.createOrReplaceTempView("employees_sql")
+    val sql_result = spark.sql(
+      """
+        |select initcap(name) as name,
+        |case when datediff(current_date() - to_date(last_checkin, 'yyyy-MM-dd')) <= 7 then 'Active'
+        |else 'Inactive'
+        |end as status
+        |from employee_sql
+        |""".stripMargin)
+
 
 
 
