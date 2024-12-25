@@ -1,0 +1,134 @@
+CREATE TABLE employeess (
+emp_id INT AUTO_INCREMENT PRIMARY KEY,
+emp_name VARCHAR(100),
+department_id INT
+);
+INSERT INTO employeess (emp_name, department_id) VALUES
+('Karthik', 1),
+('Veer', 2),
+('Veena', 3),
+('Meera', 1),
+('Pratik', NULL);
+
+CREATE TABLE depts (
+department_id INT PRIMARY KEY,
+department_name VARCHAR(100)
+);
+INSERT INTO depts (department_id, department_name) VALUES
+(1, 'HR'),
+(2, 'IT'),
+(3, 'Finance'),
+(4, 'Marketing');
+
+CREATE TABLE salaries (
+emp_id INT,
+salary DECIMAL(10, 2),
+pay_date DATE,
+PRIMARY KEY (emp_id, pay_date)
+);
+INSERT INTO salaries (emp_id, salary, pay_date) VALUES
+(1, 50000, '2024-12-01'),
+(2, 60000, '2024-12-01'),
+(3, 55000, '2024-12-01'),
+(1, 52000, '2024-12-15'),
+(2, 62000, '2024-12-15');
+
+-- Write a query to display employee names, their department names, and their salaries
+
+select e.emp_name, d.department_name, s.salary from employeess e
+join depts d on e.department_id = d.department_id
+join salaries s on e.emp_id = s.emp_id;
+
+-- List all employees and their departments, including employees without a department or salary.
+
+select e.emp_name, d.department_name from employeess e
+left join depts d on e.department_id = d.department_id;
+
+-- Retrieve employee names, department names, and salaries paid on 2024-12-01.
+
+select e.emp_name, d.department_name, s.salary from employeess e
+join depts d on e.department_id = d.department_id
+join salaries s on e.emp_id = s.emp_id
+where s.pay_date = '2024-12-01';
+
+-- Calculate the total salary paid to each department.
+
+select d.department_name, sum(s.salary) as total_salary from employeess e
+join depts d on e.department_id = d.department_id
+join salaries s on e.emp_id = s.emp_id
+group by 1;
+
+-- Find employees who haven’t received any salary.
+
+select e.emp_name,  s.salary from employeess e
+left join salaries s on e.emp_id = s.emp_id
+where s.salary is null;
+
+-- Find departments with no employees assigned.
+
+select d.department_name, e.emp_name from depts d
+left join employeess e on e.department_id = d.department_id
+where e.emp_name is null;
+
+-- List the names and salaries of employees in the HR department.
+
+select e.emp_name, s.salary from employeess e
+join depts d on e.department_id = d.department_id
+join salaries s on e.emp_id = s.emp_id
+where d.department_name = 'HR';
+
+
+-- Calculate the average salary paid to employees in each department
+
+select d.department_name, avg(s.salary) as avg_salary from employeess e
+join depts d on e.department_id = d.department_id
+join salaries s on e.emp_id = s.emp_id
+group by 1;
+
+-- For each employee, display their most recent salary payment.
+select * from (select e.emp_name, d.department_name, s.salary, s.pay_date, 
+dense_rank() over(partition by e.emp_name order by s.pay_date desc) as rn from employeess e
+join depts d on e.department_id = d.department_id
+join salaries s on e.emp_id = s.emp_id) as a
+where rn = 1;
+
+-- List employees whose salaries are above the overall average salary.
+select e.emp_name, d.department_name, s.salary from employeess e
+join depts d on e.department_id = d.department_id
+join salaries s on e.emp_id = s.emp_id
+where s.salary > (select avg(salary) from salaries);
+
+-- Count the number of employees in each department.
+
+select d.department_name, count(1) as total_emp from employeess e
+join depts d on e.department_id = d.department_id
+join salaries s on e.emp_id = s.emp_id
+group by 1;
+
+-- Identify employees who are missing department information
+
+select e.emp_name  from employeess e
+left join depts d on e.department_id = d.department_id
+where d.department_id is null;
+
+-- Show the total salary payments grouped by department and payment date.
+
+select d.department_name, s.pay_date, sum(s.salary) total_salary_paid from employeess e
+join depts d on e.department_id = d.department_id
+join salaries s on e.emp_id = s.emp_id
+group by 1,2;
+
+-- Find employees who have been paid more than once.
+
+select e.emp_name, count(s.salary) no_of_salary_paid from employeess e
+join depts d on e.department_id = d.department_id
+join salaries s on e.emp_id = s.emp_id
+group by 1
+having count(s.salary) > 1;
+
+-- Write a query to display employees who work in IT or Finance, their salaries, and payment dates.
+
+select e.emp_name, d.department_name, s.salary, s.pay_date from employeess e
+join depts d on e.department_id = d.department_id
+join salaries s on e.emp_id = s.emp_id
+where d.department_name in ('IT', 'Finance');
