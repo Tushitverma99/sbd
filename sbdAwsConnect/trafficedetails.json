@@ -1,0 +1,41 @@
+{
+  "name" : "trafficedetails",
+  "jobMode" : "VISUAL",
+  "description" : "",
+  "role" : "arn:aws:iam::825765428858:role/awss3togluejanrule",
+  "executionProperty" : {
+    "maxConcurrentRuns" : 1
+  },
+  "command" : {
+    "name" : "glueetl",
+    "scriptLocation" : "s3://aws-glue-assets-825765428858-us-east-1/scripts/trafficedetails.py",
+    "pythonVersion" : "3"
+  },
+  "defaultArguments" : {
+    "--enable-metrics" : "true",
+    "--enable-spark-ui" : "true",
+    "--spark-event-logs-path" : "s3://aws-glue-assets-825765428858-us-east-1/sparkHistoryLogs/",
+    "--enable-job-insights" : "true",
+    "--enable-observability-metrics" : "true",
+    "--enable-glue-datacatalog" : "true",
+    "--enable-continuous-cloudwatch-log" : "true",
+    "--job-bookmark-option" : "job-bookmark-disable",
+    "--job-language" : "python",
+    "--TempDir" : "s3://aws-glue-assets-825765428858-us-east-1/temporary/"
+  },
+  "maxRetries" : 0,
+  "allocatedCapacity" : 2,
+  "timeout" : 480,
+  "maxCapacity" : 2.0,
+  "glueVersion" : "5.0",
+  "numberOfWorkers" : 2,
+  "workerType" : "G.1X",
+  "executionClass" : "STANDARD",
+  "codeGenConfigurationNodes" : "{\"node-1736655941926\":{\"S3DirectTarget\":{\"AutoDataQuality\":{\"EvaluationContext\":\"EvaluateDataQuality_node1736655392693\",\"IsEnabled\":true},\"Compression\":\"none\",\"Format\":\"csv\",\"Inputs\":[\"node-1736655916703\"],\"Name\":\"Amazon S3\",\"PartitionKeys\":[],\"Path\":\"s3://mybucketjan05011995\",\"SchemaChangePolicy\":{\"EnableUpdateCatalog\":false}}},\"node-1736655807735\":{\"S3CsvSource\":{\"AdditionalOptions\":{\"EnableSamplePath\":false,\"SamplePath\":\"s3://mysbdbucketdec30/web_traffic.csv\"},\"Escaper\":\"\",\"Exclusions\":[],\"Name\":\"Amazon S3\",\"OptimizePerformance\":false,\"OutputSchemas\":[{\"Columns\":[{\"Name\":\"timestamp\",\"Type\":\"string\"},{\"Name\":\"trafficcount\",\"Type\":\"string\"}]}],\"Paths\":[\"s3://mysbdbucketdec30/web_traffic.csv\"],\"QuoteChar\":\"quote\",\"Recurse\":true,\"Separator\":\"comma\",\"WithHeader\":true}},\"node-1736655916703\":{\"SparkSQL\":{\"Inputs\":[\"node-1736655807735\"],\"Name\":\"SQL Query\",\"OutputSchemas\":[{\"Columns\":[{\"Name\":\"Timestamp\",\"Type\":\"string\"},{\"Name\":\"TrafficCount\",\"Type\":\"string\"}]}],\"SqlAliases\":[{\"Alias\":\"myDataSource\",\"From\":\"node-1736655807735\"}],\"SqlQuery\":\"select * from myDataSource\\nwhere trafficcount >10000\"}}}",
+  "sourceControlDetails" : {
+    "provider" : "GITHUB",
+    "repository" : "sbd",
+    "branch" : "master",
+    "folder" : "sbdAwsConnect"
+  }
+}
